@@ -49,7 +49,7 @@ def subida_encosta(grade, k=K_PADRAO, max_iter=2000, rng=None, inicio=None):
     for _ in range(max_iter):
         viz = gerar_vizinho(atual, livres_set, rng)
         valor_viz = valor_estado(viz, grade)
-        if valor_viz >= valor_atual:
+        if valor_viz > valor_atual:
             atual, valor_atual = viz, valor_viz
     return atual, valor_atual
 
