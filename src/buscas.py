@@ -17,14 +17,16 @@ BLOQUEADO = "#"
 
 def _padrao_objetivo(grade, objetivo):
     if objetivo is None:
-        n = len(grade)
-        return (n - 1, n - 1)
+        n_linhas = len(grade)
+        n_colunas = len(grade[0])
+        return (n_linhas - 1, n_colunas - 1)
     return tuple(objetivo)
 
 
 def _passavel(grade, r, c):
-    n = len(grade)
-    if not (0 <= r < n and 0 <= c < n):
+    n_linhas = len(grade)
+    n_colunas = len(grade[0])
+    if not (0 <= r < n_linhas and 0 <= c < n_colunas):
         return False
     return grade[r][c] != BLOQUEADO
 
@@ -149,6 +151,7 @@ def ucs(grade, inicio=(0, 0), objetivo=None):
     contador = itertools.count()
     fronteira = [(0, next(contador), inicio)]
     heapq.heapify(fronteira)
+    na_fronteira = {inicio}
     melhor_g = {inicio: 0}
     pais = {}
     nos_expandidos = 0
@@ -157,8 +160,11 @@ def ucs(grade, inicio=(0, 0), objetivo=None):
     while fronteira:
         g, _, atual = heapq.heappop(fronteira)
         # entrada obsoleta do heap: ja existe g menor, ignora sem expandir
+        # (nao toca em na_fronteira: o estado continua na fronteira
+        # pela entrada melhor ainda enfileirada, ou ja foi expandido)
         if g > melhor_g.get(atual, float("inf")):
             continue
+        na_fronteira.discard(atual)
         if atual == objetivo:
             return _resultado(pais, inicio, objetivo, grade,
                               nos_expandidos, fronteira_max, "UCS")
@@ -169,7 +175,8 @@ def ucs(grade, inicio=(0, 0), objetivo=None):
                 melhor_g[viz] = novo_g
                 pais[viz] = atual
                 heapq.heappush(fronteira, (novo_g, next(contador), viz))
-        fronteira_max = max(fronteira_max, len(fronteira))
+                na_fronteira.add(viz)
+        fronteira_max = max(fronteira_max, len(na_fronteira))
 
     return _resultado(pais, inicio, objetivo, grade,
                       nos_expandidos, fronteira_max, "UCS", sucesso=False)
@@ -210,6 +217,7 @@ def astar(grade, heuristica=h_manhattan, inicio=(0, 0), objetivo=None,
     h0 = heuristica(inicio, objetivo)
     fronteira = [(h0, next(contador), 0, inicio)]
     heapq.heapify(fronteira)
+    na_fronteira = {inicio}
     melhor_g = {inicio: 0}
     pais = {}
     nos_expandidos = 0
@@ -218,8 +226,10 @@ def astar(grade, heuristica=h_manhattan, inicio=(0, 0), objetivo=None,
     while fronteira:
         f, _, g, atual = heapq.heappop(fronteira)
         # mesma reabertura lazy do UCS: descarta pop com g desatualizado
+        # sem tocar na_fronteira (ver comentario no UCS)
         if g > melhor_g.get(atual, float("inf")):
             continue
+        na_fronteira.discard(atual)
         if atual == objetivo:
             return _resultado(pais, inicio, objetivo, grade,
                               nos_expandidos, fronteira_max, "A*",
@@ -232,7 +242,8 @@ def astar(grade, heuristica=h_manhattan, inicio=(0, 0), objetivo=None,
                 pais[viz] = atual
                 novo_f = novo_g + heuristica(viz, objetivo)
                 heapq.heappush(fronteira, (novo_f, next(contador), novo_g, viz))
-        fronteira_max = max(fronteira_max, len(fronteira))
+                na_fronteira.add(viz)
+        fronteira_max = max(fronteira_max, len(na_fronteira))
 
     return _resultado(pais, inicio, objetivo, grade,
                       nos_expandidos, fronteira_max, "A*",

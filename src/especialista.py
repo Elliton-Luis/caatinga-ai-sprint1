@@ -8,7 +8,7 @@ REGRAS = [
     ("R4", ["lesao_foliar_visivel", "praga_identificada_em_talhao_vizinho"],
      "aplicar_defensivo"),
     ("R5", ["dias_desde_pulverizacao_maior_14", "not:sensor_optico_positivo",
-            "not:armadilha_positiva"],
+            "not:armadilha_positiva", "umidade_alta"],
      "monitorar"),
     ("R6", ["not:sensor_optico_positivo", "not:armadilha_positiva",
             "dias_desde_pulverizacao_maior_14", "not:umidade_alta"],
@@ -30,14 +30,14 @@ def prova(objetivo, fatos, regras=REGRAS, trilha=None, visitados=None):
     if trilha is None:
         trilha = []
     if visitados is None:
-        visitados = set()
+        visitados = frozenset()
 
     if objetivo in fatos:
-        return fatos[objetivo], trilha
+        return bool(fatos[objetivo]), trilha
 
     if objetivo in visitados:
-        return False, trilha  # evita ciclo
-    visitados.add(objetivo)
+        return False, trilha  # evita ciclo no caminho atual
+    visitados = visitados | {objetivo}
 
     for nome_regra, antecedentes, consequente in regras:
         if consequente != objetivo:
@@ -46,6 +46,13 @@ def prova(objetivo, fatos, regras=REGRAS, trilha=None, visitados=None):
         sub_trilha = []
         for ant in antecedentes:
             alvo = _base(ant)
+            if _negado(ant):
+                # not:X exige fato base explicito ou predicado derivado.
+                # Base ausente = desconhecido -> a regra falha (mundo aberto),
+                # em vez de assumir falso (negacao como falha irrestrita).
+                if alvo not in fatos and not any(c == alvo for _, _, c in regras):
+                    todos_verdadeiros = False
+                    break
             ok, t2 = prova(alvo, fatos, regras, [], visitados)
             if _negado(ant):
                 ok = not ok

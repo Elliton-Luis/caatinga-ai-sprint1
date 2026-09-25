@@ -1,4 +1,7 @@
-from gerador_pomar import parametros_sensor
+try:
+    from gerador_pomar import parametros_sensor
+except ModuleNotFoundError:
+    from src.gerador_pomar import parametros_sensor
 
 
 def ppv(prevalencia, sensibilidade, fpr):
@@ -9,6 +12,8 @@ def ppv(prevalencia, sensibilidade, fpr):
 
     p_pos = (p_pos_dado_infestado * p_infestado +
              p_pos_dado_nao_infestado * p_nao_infestado)
+    if p_pos <= 0:
+        raise ValueError("P(+) == 0: prevalencia/sensibilidade/fpr degenerados")
     p_infestado_dado_pos = (p_pos_dado_infestado * p_infestado) / p_pos
     return p_infestado_dado_pos, p_pos
 
@@ -61,7 +66,7 @@ def relatorio(matricula):
         "alertas_por_semana": alertas_por_semana,
         "falsos_por_semana": falsos_por_semana,
         "horas_por_semana": horas_por_semana,
-        "novo_ppv": novo_ppv,
+        "novo_ppv": novo_ppv, "novo_p_pos": novo_p_pos,
     }
 
 
