@@ -1,7 +1,7 @@
 # Relatório — Caatinga.AI, Sprint 1
 
 Disciplina: Inteligência Artificial — Prof. Ronierison Maciel — UniRios — 2026.2
-Dupla: Arthur Henrique (matrícula 241.14.056) e Elliton Luis (matrícula `<PREENCHER>`)
+Dupla: Arthur Henrique (matrícula 241.14.056) e Elliton Luis (matrícula 241.14.013)
 Matrícula-semente: **24114056**
 Todos os números abaixo vêm da execução de `python src/main.py 24114056`.
 
