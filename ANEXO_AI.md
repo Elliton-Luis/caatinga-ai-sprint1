@@ -1,6 +1,7 @@
 # Ferramentas
 
 - Muse Spark 1.3(Opencode)
+- Claude (Anthropic)
 
 # Prompts
 
@@ -28,3 +29,44 @@
 >4. Repositório: faltam RELATORIO.md, resultados.csv, grafico.png, pomar.txt, README completo (§9.2: identificação, comando copiável, tabela-resumo, ordem, reabertura, mapa, limitações), ANEXO_IA.md específico (sem ele, não corrigido), 8 commits de ambos os membros, gerador_pomar.py intacto — este último ✅ ok, não alterado.
 >5. Descontos a evitar: declarar ordem no README (−0,3), eixos do gráfico e unidades (−0,2 cada).
 >Resumo: núcleo de busca correto e aferido; o risco agora é todo de entrega (relatório, artefatos, README, ANEXO_IA, main.py).
+
+## A.2 - Prompt 2
+
+> Considere os requisitos da Parte 4.3 do arquivo `Atividade-Pratica.pdf`, dentro do arquivo `bayes.py`, implemente os cálculos de Bayes com os parâmetros da minha semente (matrícula 24114056), avalie a implementação conforme os critérios do documento, após isso, me retorne uma avaliação de quais pontos dos requisitos foram cumpridos.
+
+## Resposta - Prompt 2
+
+- Houve alterações somente no arquivo requerido, `bayes.py`, implementando `ppv()` e `relatorio()` a partir de `parametros_sensor()` do arquivo `gerador_pomar.py`.
+
+- Esse foi o retorno obtido pela IA:
+
+>Avaliação por requisito
+>Cumpridos (dentro de bayes.py):
+>- §4.3(a) cálculo de P(infestado|+) via Teorema de Bayes, com a substituição explícita na fórmula; §4.3(b) conversão para "a cada 100 alertas, quantos serão falsos"; §4.3(c) alertas/semana, alertas falsos/semana e horas/semana perdidas, a partir de `talhoes_por_semana`; §4.3(d) recálculo do PPV com sensibilidade 99,9% mantendo a taxa de falso positivo, com comparação numérica ao valor original.
+>Ainda pendentes (fora do escopo de bayes.py, zeram/descontam se não feitos):
+>1. Relatório: transcrever os quatro parâmetros do sensor e os resultados de (a)-(d) para RELATORIO.md, com a análise textual de por que aumentar a sensibilidade não resolve o problema (dominância da taxa de falso positivo quando a prevalência é baixa) e qual parâmetro mexeria de fato (§4.3(d)) — cálculo pronto, redação ainda não.
+>2. Item 4.4: decisão que deve ficar em regra explícita, não em modelo aprendido — é resposta textual/justificativa no relatório, não um cálculo de bayes.py.
+>3. Item 4.1/4.2: sistema especialista com encadeamento para trás (`src/especialista.py`) — módulo separado, não coberto por este prompt.
+>4. Parte 5 (auditoria do laudo): as afirmações 3 e 4 do fornecedor dependem diretamente destes números (PPV real vs. sensibilidade alegada; recálculo de duas confirmações positivas) — ainda precisam ser redigidas no relatório usando esses valores como evidência numérica.
+>Resumo: cálculos de Bayes corretos e aferidos com a semente real; o risco agora é a redação/análise no relatório e a conexão desses números com a Parte 5 (auditoria).
+
+## A.2 - Prompt 3
+
+> Considere os requisitos da Parte 4.1 e 4.2 do arquivo `Atividade-Pratica.pdf`, dentro do arquivo `especialista.py`, implemente de 5 a 8 regras SE...ENTÃO e um motor de encadeamento para trás que imprima a cadeia de regras que sustentou a conclusão, avalie a implementação conforme os critérios do documento, após isso, me retorne uma avaliação de quais pontos dos requisitos foram cumpridos.
+
+## Resposta - Prompt 3
+
+- Houve alterações somente no arquivo requerido, `especialista.py`, implementando 7 regras (`REGRAS`), a função `prova()` (encadeamento para trás recursivo) e `explicar()` (imprime fatos, conclusão e trilha de regras).
+
+- Esse foi o retorno obtido pela IA:
+
+>Avaliação por requisito
+>Cumpridos (dentro de especialista.py):
+>- §4.1 base com 7 regras (dentro do intervalo 5-8 pedido), no formato SE...ENTAO; encadeamento para trás funcional via `prova()`, com suporte a antecedentes negados (`not:`) e proteção contra ciclo (`visitados`); impressão da cadeia de regras que sustentou a conclusão (`explicar()`), respondendo o "por que você concluiu isso?" da Aula 05.
+>- §4.2 caso legítimo que a base classifica errado sem R2 (sensor positivo + histórico de infestação, sem armadilha/umidade), com traço de execução antes (conclusão errada: False) e depois (R2 adicionada, conclusão correta), sem contradizer as demais regras.
+>Ainda pendentes (fora do escopo de especialista.py, zeram/descontam se não feitos):
+>1. Relatório: transcrever as 7 regras, o exemplo de execução com a trilha impressa, e o par de traços antes/depois de 4.2 para RELATORIO.md — o motor está pronto e testado, falta a redação.
+>2. Item 4.3 (bayes.py) e 4.4: decisão que deve ficar em regra explícita — 4.4 é resposta textual/justificativa (ex.: aplicação de defensivo), não faz parte deste módulo.
+>3. Cobertura da base: as 7 regras cobrem os casos usados nos testes, mas não há uma verificação sistemática de que toda combinação relevante de fatos (armadilha, sensor, histórico, umidade, dias de pulverização, chuva) leve a alguma conclusão — risco de "buracos" na base não testados que só apareceriam na arguição com uma semente nova.
+>4. Parte 5 (auditoria do laudo): nenhuma das 5 afirmações do fornecedor trata do sistema especialista diretamente, então este módulo não alimenta a Parte 5 como bayes.py e buscas.py alimentam.
+>Resumo: motor de encadeamento para trás e regras corretos e testados nos dois casos exigidos (4.1 e 4.2); o risco agora é cobertura de casos não testados e a transcrição para o relatório.
