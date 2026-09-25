@@ -1,11 +1,19 @@
-# Ferramentas
+# ANEXO_IA — Uso de assistentes de IA
 
-- Muse Spark 1.3(Opencode)
+## A.1 — Ferramentas
+
+- Muse Spark 1.3 (Opencode)
 - Claude (Anthropic)
 
-# Prompts
+Uso por parte (a IA participou de tudo, seja como escritora ou analista de código):
 
-## A.2 - Prompt 1
+- `src/buscas.py` (Parte 2 e 3.1): implementação de BFS, DFS, UCS e A* com os 4 contadores.
+- `src/bayes.py` (Parte 4.3): implementação de `ppv()` e `relatorio()` com a semente 24114056.
+- `src/especialista.py` (Parte 4.1 e 4.2): implementação das 7 regras, `prova()` e `explicar()`.
+
+## A.2 — Prompts na íntegra e respostas recebidas
+
+### A.2 - Prompt 1
 
 > Considere os requisitos do arquivo `Atividade-Pratica.pdf`,
 > dentro do arquivo `buscas.py`, implemente as buscas BFS, DFS,
@@ -13,7 +21,7 @@
 > documento, após isso, me retorne uma avaliação de quais pontos
 > dos requisitos foram cumpridos.
 
-## Resposta - Prompt 1
+### Resposta - Prompt 1
 
 - Houve alterações somente no arquivo requerido, `buscas.py`, onde as funções foram implementadas. A implementação será posteriormente verificada por meio dos experimentos e resultados exigidos pela atividade.
 
@@ -30,11 +38,11 @@
 >5. Descontos a evitar: declarar ordem no README (−0,3), eixos do gráfico e unidades (−0,2 cada).
 >Resumo: núcleo de busca correto e aferido; o risco agora é todo de entrega (relatório, artefatos, README, ANEXO_IA, main.py).
 
-## A.2 - Prompt 2
+### A.2 - Prompt 2
 
 > Considere os requisitos da Parte 4.3 do arquivo `Atividade-Pratica.pdf`, dentro do arquivo `bayes.py`, implemente os cálculos de Bayes com os parâmetros da minha semente (matrícula 24114056), avalie a implementação conforme os critérios do documento, após isso, me retorne uma avaliação de quais pontos dos requisitos foram cumpridos.
 
-## Resposta - Prompt 2
+### Resposta - Prompt 2
 
 - Houve alterações somente no arquivo requerido, `bayes.py`, implementando `ppv()` e `relatorio()` a partir de `parametros_sensor()` do arquivo `gerador_pomar.py`.
 
@@ -50,11 +58,11 @@
 >4. Parte 5 (auditoria do laudo): as afirmações 3 e 4 do fornecedor dependem diretamente destes números (PPV real vs. sensibilidade alegada; recálculo de duas confirmações positivas) — ainda precisam ser redigidas no relatório usando esses valores como evidência numérica.
 >Resumo: cálculos de Bayes corretos e aferidos com a semente real; o risco agora é a redação/análise no relatório e a conexão desses números com a Parte 5 (auditoria).
 
-## A.2 - Prompt 3
+### A.2 - Prompt 3
 
 > Considere os requisitos da Parte 4.1 e 4.2 do arquivo `Atividade-Pratica.pdf`, dentro do arquivo `especialista.py`, implemente de 5 a 8 regras SE...ENTÃO e um motor de encadeamento para trás que imprima a cadeia de regras que sustentou a conclusão, avalie a implementação conforme os critérios do documento, após isso, me retorne uma avaliação de quais pontos dos requisitos foram cumpridos.
 
-## Resposta - Prompt 3
+### Resposta - Prompt 3
 
 - Houve alterações somente no arquivo requerido, `especialista.py`, implementando 7 regras (`REGRAS`), a função `prova()` (encadeamento para trás recursivo) e `explicar()` (imprime fatos, conclusão e trilha de regras).
 
@@ -70,3 +78,24 @@
 >3. Cobertura da base: as 7 regras cobrem os casos usados nos testes, mas não há uma verificação sistemática de que toda combinação relevante de fatos (armadilha, sensor, histórico, umidade, dias de pulverização, chuva) leve a alguma conclusão — risco de "buracos" na base não testados que só apareceriam na arguição com uma semente nova.
 >4. Parte 5 (auditoria do laudo): nenhuma das 5 afirmações do fornecedor trata do sistema especialista diretamente, então este módulo não alimenta a Parte 5 como bayes.py e buscas.py alimentam.
 >Resumo: motor de encadeamento para trás e regras corretos e testados nos dois casos exigidos (4.1 e 4.2); o risco agora é cobertura de casos não testados e a transcrição para o relatório.
+
+## A.3 — Erro do assistente com evidência experimental
+
+Afirmação do assistente:
+
+Afirmou que usar um conjunto global de visitados com visitados.add(objetivo) sem remoção tratava ciclos de forma correta e eficiente no encadeamento para trás de especialista.py.
+
+O erro:
+
+Confundiu detecção de ciclo com nós compartilhados em grafos de dedução (estrutura em diamante, como $A \leftarrow B \land C$, onde $B$ e $C$ dependem do mesmo fato intermediário $D$). Ao provar $B$, $D$ ficava gravado permanentemente em visitados; ao tentar provar $C$, o algoritmo considerava $D$ um ciclo e abortava a dedução prematuramente.
+
+Evidência experimental:
+
+Ao rodar o contraexemplo abaixo, a implementação da IA falhou:
+
+```python
+regras = [("RD", ["E"], "D"), ("RB", ["D"], "B"), ("RC", ["D"], "C"), ("RA", ["B", "C"], "A")]
+
+prova("A", {"E": True}, regras)
+# - Retorno da IA: (False, []) | Esperado: (True, [...])
+```
