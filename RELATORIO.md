@@ -94,8 +94,10 @@ Mesmo número de passos, mas a BFS passou por mais que o dobro de talhões encha
 | 800 | 1,103 s | 0,116 s | 2,025 s |
 | 1500 | 3,752 s | 4,089 s | 7,986 s |
 | 2500 | 10,897 s | 0,482 s | 24,395 s |
+| 3000 | 26,4 s | 1,270 s | 59,5 s |
+| 3500 | 35,6 s | 1,292 s | 80,4 s **FALHA (> 60 s)** |
 
-Nenhuma das três estratégias estourou memória ou pilha até `n=2500` (a implementação de DFS aqui é **iterativa**, com pilha explícita em lista, não recursiva — por isso não sofre `RecursionError`). O fator limitante é **tempo**: a UCS cresce mais rápido que a BFS porque, além de expandir um número de nós parecido com o da BFS (o grid é denso e o objetivo fica no canto oposto), cada expansão custa `O(log |fronteira|)` por causa do heap de prioridade, contra `O(1)` amortizado da fila da BFS. Extrapolando a curva de UCS (que já passa de 24 s em `n=2500`, crescendo mais que linearmente com `n²`), o estouro do limite de 60 s deve ocorrer por volta de `n≈3300–3500` — valor não medido diretamente nesta execução, apenas extrapolado; deve ser confirmado rodando o código.
+A primeira falha foi da **UCS em `n=3500`, com 80,4 s (> 60 s)** — limite de **tempo** atingido. Nenhuma estourou memória ou pilha até lá (a DFS aqui é **iterativa**, com pilha explícita em lista, não recursiva — por isso não sofre `RecursionError`). A UCS cresce mais rápido que a BFS porque, além de expandir um número de nós parecido com o da BFS (o grid é denso e o objetivo fica no canto oposto), cada expansão custa `O(log |fronteira|)` por causa do heap de prioridade, contra `O(1)` amortizado da fila da BFS.
 
 Isso se relaciona com a fórmula da Aula 03 de complexidade de busca em espaço `O(b^d)`: aqui `b≈4` (vizinhos) e o espaço de estados cresce com `n²`, então o custo de busca cresce quadraticamente com `n`, e o overhead logarítmico da fila de prioridade da UCS agrava isso a cada expansão.
 
@@ -207,10 +209,10 @@ R2 corrige o caso sem contradizer R1, R3–R7 (antecedentes diferentes, mesmo co
 | # | Afirmação | Veredito | Justificativa (número medido) |
 |---|---|---|---|
 | 1 | "A* com h=4×Manhattan é comprovadamente ótimo" | **Incorreta** | A* só é ótimo com heurística admissível. h3 não é admissível (h3(0,0)=88 > custo real=34, Parte 3.2) e de fato devolveu rota de custo **40**, 17,6% mais cara que o ótimo (34, Parte 3.3). |
-| 2 | "BFS→A* reduziu custo, provando que a heurística melhora a qualidade" | **Parcialmente correta** | A queda de custo (49→34) vem de trocar uma busca cega por uma busca sensível a custo — a **UCS sem heurística nenhuma** já atinge o mesmo custo ótimo 34 (Parte 2.2). A heurística (h2) só reduz **nós expandidos** (123→108, Parte 3.1), não muda o custo da rota ótima. |
+| 2 | "BFS→A* reduziu custo, provando que a heurística melhora a qualidade" | **Parcialmente correta** | A queda de custo (49→34 = 30,6%, não 38% como alegado) vem de trocar uma busca cega por uma busca sensível a custo — a **UCS sem heurística nenhuma** já atinge o mesmo custo ótimo 34 (Parte 2.2). A heurística (h2) só reduz **nós expandidos** (123→108, Parte 3.1), não muda o custo da rota ótima. |
 | 3 | "Sensibilidade de 99% → 99% dos apontamentos são infestação real" | **Incorreta** | Confunde sensibilidade com PPV. Com nossos parâmetros, `P(infestado\|+) = 36,06%` (Parte 4.3a), bem distante de 99%. |
 | 4 | "Dois testes positivos seguidos → confiança > 99%" | **Parcialmente correta** | Repetir o teste e atualizar o prior bayesiano de fato eleva a confiança (mecanismo correto), mas com nossos números o PPV após dois positivos sucessivos fica em **≈ 94,9%**, não acima de 99% — e a conta assume independência entre os dois testes, o que raramente vale para o mesmo sensor físico medindo o mesmo talhão nas mesmas condições. |
-| 5 | "DFS usa menos memória e, como o ambiente é estático/observável, é suficiente" | **Incorreta** | DFS de fato usa menos memória (fronteira máx. 48 vs. 19 da UCS, Parte 2.2), mas "estático e observável" não tem relação com qualidade da solução — DFS devolveu custo **126**, 3,7× o ótimo (34), inaceitável para uma rota de produção. |
+| 5 | "DFS usa menos memória e, como o ambiente é estático/observável, é suficiente" | **Incorreta** | Em teoria DFS usa menos memória (O(d)), mas nesta grade mediu fronteira máx. 48 vs. 19 da UCS (Parte 2.2), ou seja, maior; além disso "estático e observável" não tem relação com qualidade da solução — DFS devolveu custo **126**, 3,7× o ótimo (34), inaceitável para uma rota de produção. |
 
 **Recomendação:** **contratar com ressalvas.** O laudo mistura afirmações corretas (uso de A*, uso de sensibilidade) com conclusões estatística e algoritmicamente erradas (confundir admissibilidade com otimalidade garantida, confundir sensibilidade com PPV). A condição técnica que mudaria a resposta: a AgroVision reapresentar a proposta com (i) prova de admissibilidade da heurística usada e (ii) o PPV real do sensor calculado com a prevalência real do pomar, não apenas a sensibilidade isolada.
 

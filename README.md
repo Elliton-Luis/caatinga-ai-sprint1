@@ -81,9 +81,8 @@ Tabelas completas (Bayes, sistema especialista, escalabilidade, auditoria do lau
 
 ## 7. Limitações conhecidas
 
-- A escalabilidade da Parte 2.4 foi medida até `n=2500` nesta máquina; o ponto exato de
-  estouro de 60s para UCS (extrapolado entre `n≈3300` e `n≈3500`) não foi executado, pois o
-  tempo já ultrapassava 24s em `n=2500` e cresce mais que linearmente.
+- A escalabilidade da Parte 2.4 foi medida até `n=3500` nesta máquina; a primeira falha
+  foi da UCS em `n=3500` com 80,4 s (> 60 s, limite de tempo).
 - O contraexemplo da "Liga de IA" (bônus DFS > 2× ótimo em grade 8×8) ainda não foi
   construído neste repositório.
 - `requirements.txt` lista apenas `matplotlib`; nenhuma outra dependência externa é usada.

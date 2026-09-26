@@ -8,6 +8,7 @@
 Uso por parte (a IA participou de tudo, seja como escritora ou analista de código):
 
 - `src/buscas.py` (Parte 2 e 3.1): implementação de BFS, DFS, UCS e A* com os 4 contadores.
+- `src/busca_local.py` (Parte 3.4): implementação de subida de encosta e têmpera simulada com K=15.
 - `src/bayes.py` (Parte 4.3): implementação de `ppv()` e `relatorio()` com a semente 24114056.
 - `src/especialista.py` (Parte 4.1 e 4.2): implementação das 7 regras, `prova()` e `explicar()`.
 
@@ -99,3 +100,7 @@ regras = [("RD", ["E"], "D"), ("RB", ["D"], "B"), ("RC", ["D"], "C"), ("RA", ["B
 prova("A", {"E": True}, regras)
 # - Retorno da IA: (False, []) | Esperado: (True, [...])
 ```
+
+## A.4 — Aprendizado
+
+Depois que eu rodei o código eu entendi que a h3, mesmo sendo inadmissível, por estimar um valor maior que o custo real, acaba olhando bem menos posições e terminando mais rápido, só que entrega um caminho mais caro que o do UCS, e esse trade-off parecia apenas um erro pela definição, antes de rodar o programa.
