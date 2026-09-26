@@ -37,7 +37,7 @@ def main(matricula):
         r = fn(grade)
         dt_ms = (time.perf_counter() - t0) * 1000
         resultados_cegos[nome] = r
-        linhas_csv.append([nome, "-", r["custo"], r["passos"], r["nos_expandidos"],
+        linhas_csv.append([nome, "", r["custo"], r["passos"], r["nos_expandidos"],
                             r["fronteira_max"], round(dt_ms, 3)])
         print(f"{nome}: custo={r['custo']} passos={r['passos']} "
               f"nos_expandidos={r['nos_expandidos']} fronteira_max={r['fronteira_max']}")
