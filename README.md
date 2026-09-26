@@ -22,7 +22,21 @@ para avaliar a confiabilidade do sensor óptico de pragas.
 ## 3. Como rodar
 
 - **Python:** 3.10 ou superior
-- **Instalação:**
+- **Ambiente virtual (recomendado):**
+
+```bash
+python -m venv venv
+```
+
+Ative conforme o SO:
+
+| SO | Ativar | Desativar |
+|---|---|---|
+| Linux / macOS (bash/zsh) | `source venv/bin/activate` | `deactivate` |
+| Windows (PowerShell) | `venv\Scripts\Activate.ps1` | `deactivate` |
+| Windows (cmd) | `venv\Scripts\activate.bat` | `deactivate` |
+
+- **Instalação (com venv ativo):**
 
 ```bash
 pip install -r requirements.txt
